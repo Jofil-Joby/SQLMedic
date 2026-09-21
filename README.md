@@ -1,50 +1,133 @@
 # SQLMedic
 
-> Portable agent for identifying broad SQL selection patterns that deserve review.
+> A portable engineering agent for **SQL hygiene**.
 
-## What it does
+SQLMedic inspects observable project evidence, detects **wildcard SELECT queries**, and produces an explainable improvement plan. Its purpose is not to replace specialist tooling. It provides a focused, auditable diagnostic layer that can travel across agent runtimes.
 
-SQLMedic scans available project source for wildcard queries of the form `SELECT * FROM ...`. It reports the observed pattern and recommends narrowing queries to the columns actually required.
+## What makes it different
 
-### Diagnostic fingerprint
-
-**SQL pattern → query-risk signal → evidence → targeted remediation**
-
-## Why this agent is distinct
-
-SQLMedic does not pretend that a single SQL pattern proves a performance or security failure. Its purpose is narrower: surface a recognizable query pattern that deserves review.
-
-That deterministic boundary makes its output reproducible and explainable.
-
-## Workflow
+This project follows an **evidence → decision → explanation** model:
 
 ```text
-SQL/source files
-      ↓
-Pattern scanner
-      ↓
-Wildcard-query rule
-      ↓
-Evidence-backed finding
-      ↓
-Query refinement plan
+Project
+  ↓
+Scanner
+  ↓
+Domain Evidence
+  ↓
+Deterministic Diagnostic Rule
+  ↓
+Finding + Evidence + Confidence
+  ↓
+Improvement Plan
 ```
+
+The agent does not invent evidence. A finding is tied to what the scanner can actually observe.
+
+## Diagnostic contract
+
+| Layer | SQLMedic behavior |
+| --- | --- |
+| Domain | SQL hygiene |
+| Primary signal | SQL source containing SELECT * |
+| Remediation | Select only the columns required |
+| Output | Structured, explainable findings |
+| Uncertainty | Explicitly constrained by available evidence |
+
+## Portable architecture
+
+```text
+                    ┌─────────────────────┐
+                    │   Portable Agent    │
+                    │ identity + behavior  │
+                    └──────────┬──────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              ↓                ↓                ↓
+          Diagnostic        Duties &         Explainability
+            Logic           Workflow           Contract
+              │
+              ↓
+        Runtime Adapters
+       ┌──────┬──────┬──────┬──────┐
+       ↓      ↓      ↓      ↓
+    OpenAI  CrewAI  Claude  Lyzr
+```
+
+The core diagnostic logic is kept separate from framework-specific adapters. This is the central design idea of the project, not four copies of the same agent wearing different hats.
+
+## Repository structure
+
+```text
+agent.yaml          # Portable identity and passport metadata
+SOUL.md             # Identity, principles, and behavior
+AGENTS.md           # Agent responsibilities
+DUTIES.md           # Maker / Checker workflow
+EXPLAINABILITY.md   # Decision, inputs, limits, and evidence contract
+core/               # Shared result model
+tools/              # Scanner and domain diagnostics
+skills/             # Declared capabilities
+workflows/          # Agent workflows
+adapters/           # Runtime-facing adapters
+tests/              # Deliberately diagnostic project fixtures
+```
+
+## Passport portability
+
+The agent is structured for the OpenGAP passport model and can be exported to:
+
+- OpenAI Agents SDK
+- CrewAI
+- Claude Code
+- Lyzr
+
+The important part is the **portable contract**: identity, behavior, duties, explainability, tools, and skills remain defined independently of a single runtime.
 
 ## Verification
 
-Included:
-- OpenGAP-compatible passport
-- SQL-focused broken-project fixture
-- explainability and behavior contracts
-- OpenAI, CrewAI, Claude Code, and Lyzr adapters
-- adapter verification tests
+The repository includes:
 
-The OpenGAP validator passed, and all four framework exports have been exercised successfully.
+- Local adapter verification
+- A domain-specific broken-project fixture
+- OpenGAP-compatible passport metadata
+- Explainability requirements
+- Export verification across the supported targets
 
-## Design principle
+The engineering workflow is:
 
-**A signal is not a verdict.** SQLMedic flags a concrete pattern and leaves broader performance or security conclusions to deeper analysis.
+```text
+Validate passport
+    → Verify adapters
+    → Run diagnostic fixture
+    → Export with OpenGAP
+    → Inspect generated artifacts
+```
 
-## Medic family
+## Scope and limitations
 
-SQLMedic contributes a database-specific diagnostic to the Medic family, preserving a common portable contract while maintaining a distinct technical focus.
+SQLMedic is a focused diagnostic prototype. Its conclusions are limited to the evidence and rules implemented in this repository. It should complement, not replace, production-grade static analysis, security scanners, observability platforms, CI systems, or human review where appropriate.
+
+## Why this project exists
+
+This repository is one member of a deliberately modular **Medic agent family**. Each agent applies the same portable passport architecture to a different engineering failure surface.
+
+That makes the collection useful as an interoperability experiment:
+
+```text
+One passport architecture
+        +
+Different diagnostic domains
+        +
+Multiple agent runtimes
+        =
+Portable engineering-agent family
+```
+
+## Challenge context
+
+Built for the **HiDevs × Lyzr Agent Passport Challenge**, exploring portable agent identity, behavior contracts, explainability, verification, and framework interoperability.
+
+## Author
+
+**Jofil Joby**  
+[GitHub](https://github.com/Jofil-Joby)
