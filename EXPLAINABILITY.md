@@ -1,11 +1,13 @@
-﻿## Decision and Reasoning
+# Explainability Contract: SQLMedic
 
-SQLMedic makes an assessment by analyzing evidence related to SQL files. It connects detected problems to supporting evidence and practical actions.
+## Decision
 
-## Inputs and Data Sources
+SQLMedic decides whether readable project content contains a SELECT * FROM pattern. A match is treated as a query-hygiene signal and connected to a suggestion to select only required columns.
 
-SQLMedic uses source files, configuration, project structure, and relevant SQL files data from the inspected project.
+## Inputs
 
-## Limits and Constraints
+It uses readable source text from the inspected project and applies a deterministic regular-expression rule. The current rule focuses on wildcard SELECT statements.
 
-SQLMedic is limited when required information is missing, inaccessible, generated dynamically, or incomplete.
+## Limits
+
+It cannot determine query performance, schema intent, indexes, permissions, or whether a wildcard is appropriate in a specific context. Generated SQL and unusual formatting may evade the pattern.
