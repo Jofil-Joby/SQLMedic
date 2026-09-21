@@ -1,0 +1,4 @@
+﻿spec_version: "0.1.0"
+name: sqlmedic
+version: "0.1.0"
+description: A portable AI agent that analyzes SQL files and produces an explainable improvement plan.
